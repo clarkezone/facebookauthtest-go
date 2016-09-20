@@ -1,50 +1,50 @@
 package main
 
 import (
-"io"
-"net/http"
-"log"
-"crypto/tls"
+	"crypto/tls"
+	"io"
+	"log"
+	"net/http"
 
-"github.com/dkumor/acmewrapper"
+	"github.com/dkumor/acmewrapper"
 )
 
 func HelloServer(w http.ResponseWriter, req *http.Request) {
-io.WriteString(w, "Hello, world.\n")
+	io.WriteString(w, "Hello, world.\n")
 }
 
 func main() {
 	mux := http.NewServeMux()
-mux.HandleFunc("/hello", HelloServer)
+	mux.HandleFunc("/hello", HelloServer)
 
-w, err := acmewrapper.New(acmewrapper.Config{
-Domains: []string{"example.com", "www.example.com"},
-Address: ":443",
+	w, err := acmewrapper.New(acmewrapper.Config{
+		Domains: []string{"example.com", "www.example.com"},
+		Address: ":443",
 
-TLSCertFile: "cert.pem",
-TLSKeyFile: "key.pem",
+		TLSCertFile: "cert.pem",
+		TLSKeyFile:  "key.pem",
 
-RegistrationFile: "user.reg",
-PrivateKeyFile: "user.pem",
+		RegistrationFile: "user.reg",
+		PrivateKeyFile:   "user.pem",
 
-TOSCallback: acmewrapper.TOSAgree,
-})
+		TOSCallback: acmewrapper.TOSAgree,
+	})
 
-if err!=nil {
-log.Fatal("acmewrapper: ", err)
-}
+	if err != nil {
+		log.Fatal("acmewrapper: ", err)
+	}
 
-tlsconfig := w.TLSConfig()
+	tlsconfig := w.TLSConfig()
 
-listener, err := tls.Listen("tcp", ":443", tlsconfig)
-if err != nil {
-	log.Fatal("Listener: ", err)
-}
+	listener, err := tls.Listen("tcp", ":443", tlsconfig)
+	if err != nil {
+		log.Fatal("Listener: ", err)
+	}
 
-server := &http.Server{
-	Addr: ":443",
-	Handler: mux,
-	TLSConfig: tlsconfig,
-}
-server.Serve(listener)
+	server := &http.Server{
+		Addr:      ":443",
+		Handler:   mux,
+		TLSConfig: tlsconfig,
+	}
+	server.Serve(listener)
 }
